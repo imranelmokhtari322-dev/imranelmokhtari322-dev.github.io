@@ -1,3 +1,0 @@
-# TvGoud
-
-https://tvgoud.org

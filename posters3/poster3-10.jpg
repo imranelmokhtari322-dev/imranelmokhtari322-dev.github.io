@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- Payment Links Script -->
+    <script>
+    (function() {
+      var API_URL = "https://mclgpegcdiexffgwychk.supabase.co/functions/v1/get-payment-links";
+
+      function resolveDomain() {
+        var d = window.location.hostname.replace(/^www\./, "");
+        try {
+          var canonical = document.querySelector('link[rel="canonical"]');
+          if (canonical && canonical.href) {
+            var u = new URL(canonical.href, window.location.origin);
+            if (u.hostname) d = u.hostname.replace(/^www\./, "");
+          }
+        } catch (e) {}
+        return d;
+      }
+
+      window.PaymentLinks = {
+        data: null,
+        loading: true,
+
+        init: function() {
+          var self = this;
+          var domain = resolveDomain();
+          fetch(API_URL + "?domain=" + encodeURIComponent(domain) + "&t=" + Date.now(), { cache: "no-store" })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { self.data = d; self.loading = false; })
+            .catch(function(e) { console.error("PaymentLinks error:", e); self.loading = false; });
+        },
+
+        redirectToPlan: function(planCode) {
+          if (!this.data || !this.data.plans) {
+            if (this.data && this.data.fallback_url) window.location.href = this.data.fallback_url;
+            return;
+          }
+          var plan = this.data.plans.find(function(p) { return p.plan_code === planCode; });
+          if (plan) {
+            var url = plan.is_redirect_enabled && plan.redirect_url ? plan.redirect_url : plan.payment_url;
+            if (url) window.location.href = url;
+            else if (this.data.fallback_url) window.location.href = this.data.fallback_url;
+          } else if (this.data.fallback_url) {
+            window.location.href = this.data.fallback_url;
+          }
+        }
+      };
+
+      setTimeout(function() { window.PaymentLinks.init(); }, 0);
+    })();
+    </script>
+
+    <!-- Default sitewide meta (per-route overrides via react-helmet-async) -->
+    <title>TV Luxry | IPTV Premium en Europe</title>
+    <meta name="title" content="TV Luxry | IPTV Premium en Europe" />
+    <meta name="description" content="TV Luxry : IPTV premium en Europe. +18000 chaînes TV, films, séries et sports en direct. Livraison instantanée 24/7." />
+    <meta name="author" content="TV Luxry" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph defaults (per-route overrides via Helmet) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TV Luxry" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:image" content="https://tvluxry.com/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://tvluxry.com/og-image.jpg" />
+
+    <!-- Sitewide Organization schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TV Luxry",
+      "url": "https://tvluxry.com",
+      "logo": "https://tvluxry.com/logo.png",
+      "description": "Service IPTV premium avec plus de 18000 chaînes TV, films, séries et sports en streaming.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+44-7309-656113",
+        "contactType": "customer service",
+        "availableLanguage": ["French", "English", "Arabic"]
+      }
+    }
+    </script>
+    <script type="module" crossorigin src="/assets/index-C9-X1Kg6.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BU2ijV2q.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
